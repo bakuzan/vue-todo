@@ -5,7 +5,8 @@
       <todo-list-item 
         v-for="todo in items" 
         :key="todo.id" 
-        v-bind:item="todo"
+        :item="todo"
+        v-on:remove="$emit('onRemove')"
       >
       </todo-list-item>
     </ul>

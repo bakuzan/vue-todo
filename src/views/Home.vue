@@ -5,13 +5,17 @@
       <input 
         type="text" 
         class="new-todo" 
-        v-model="text" 
+        v-model="newTodo" 
         placeholder="What do you need to do?" 
         autocomplete="off"
         autofocus="autofocus"
+        @keyup.enter="addTodo"
       />
     </header>
-    <TodoList v-bind:items="todos"/>
+    <TodoList 
+      :items="todos"
+      v-on:on-remove="onRemove"
+    />
     <footer></footer>
   </section>
 </template>
@@ -19,6 +23,8 @@
 <script>
 // @ is an alias to /src
 import TodoList from '@/components/TodoList.vue';
+import store from '@/utils/store';
+import * as utils from '@/utils';
 
 export default {
   name: 'home',
@@ -27,15 +33,40 @@ export default {
   },
   data: function() {
     return {
-      text: '',
-      todos: [
-        { id: 1, text: 'buy milk', isComplete: false },
-        { id: 2, text: 'buy paper', isComplete: false },
-        { id: 3, text: 'read paper', isComplete: false }
-      ]
+      newTodo: '',
+      todos: store.fetch()
     };
   },
-  methods: {}
+  watch: {
+    todos: {
+      handler: function(todos) {
+        console.log('persist todos', todos);
+        store.update(todos);
+      },
+      deep: true
+    }
+  },
+  methods: {
+    addTodo: function() {
+      const value = this.newTodo && this.newTodo.trim();
+      if (!value) {
+        return;
+      }
+      console.log('add');
+
+      this.todos.push({
+        id: utils.uniqueId(),
+        text: this.newTodo,
+        isComplete: false
+      });
+      this.newTodo = '';
+    },
+    onRemove: function(id) {
+      console.log('remove', id);
+      const index = this.todos.findIndex((x) => x.id === id);
+      this.todos.splice(index, 1);
+    }
+  }
 };
 </script>
 
