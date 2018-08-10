@@ -5,15 +5,30 @@
             type="checkbox" class="todo__checkbox" 
             v-model="item.isComplete" 
         />
-        <label class="todo__label">
+        <label 
+            class="todo__label"
+            @dblclick="$emit('edit', item.id)"
+        >
             {{item.text}}
         </label>
         <button 
             class="todo__destroy"
-            v-on:click="$emit('remove', item.id)"
+            @click="$emit('remove', item.id)"
         >
         </button>
       </div>
+      <input 
+        type="text" 
+        class="edit" 
+        v-model="item.text" 
+        v-todo-focus="isEdit"
+        placeholder="" 
+        autocomplete="off"
+        autofocus="autofocus"
+        @keyup.enter="$emit('update', item.id)"
+        @blur="$emit('update', item.id)"
+        @keyup.esc="$emit('cancel', item)"
+      />
   </li>
 </template>
 
@@ -21,14 +36,26 @@
 export default {
   name: 'TodoListItem',
   props: {
-    item: Object
+    item: Object,
+    isEdit: Boolean
   },
   computed: {
     classes: function() {
       return {
         todo: true,
-        'todo--complete': this.item.isComplete
+        'todo--complete': this.item.isComplete,
+        'todo--editing': this.isEdit
       };
+    }
+  },
+  // a custom directive to wait for the DOM to be updated
+  // before focusing on the input field.
+  // http://vuejs.org/guide/custom-directive.html
+  directives: {
+    'todo-focus': function(el, binding) {
+      if (binding.value) {
+        el.focus();
+      }
     }
   }
 };
@@ -83,5 +110,17 @@ export default {
 }
 .todo__destroy:after {
   content: '×';
+}
+
+.edit {
+  display: none;
+  width: calc(100% - 45px);
+  margin-left: 45px;
+}
+.todo--editing .edit {
+  display: block;
+}
+.todo--editing .todo__view {
+  display: none;
 }
 </style>

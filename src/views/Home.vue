@@ -14,7 +14,12 @@
     </header>
     <TodoList 
       :items="todos"
-      v-on:on-remove="onRemove"
+      :edit-item="editTodo"
+      @on-edit="onEdit"
+      @on-update="onUpdate"
+      @on-cancel="onCancel"
+      @on-remove="onRemove"
+      @toggle-all="onToggleAll"
     />
     <footer></footer>
   </section>
@@ -34,19 +39,24 @@ export default {
   data: function() {
     return {
       newTodo: '',
+      editTodo: null,
       todos: store.fetch()
     };
   },
   watch: {
     todos: {
       handler: function(todos) {
-        console.log('persist todos', todos);
         store.update(todos);
       },
       deep: true
     }
   },
+
   methods: {
+    onToggleAll: function() {
+      const allTrue = this.todos.every((x) => x.isComplete);
+      this.todos.forEach((t) => (t.isComplete = !allTrue));
+    },
     addTodo: function() {
       const value = this.newTodo && this.newTodo.trim();
       if (!value) {
@@ -60,6 +70,27 @@ export default {
         isComplete: false
       });
       this.newTodo = '';
+    },
+    onEdit: function(id) {
+      console.log('edit', id);
+      const todo = this.todos.find((x) => x.id === id);
+      this.editTodo = todo;
+    },
+    onUpdate: function(id) {
+      console.log('update', id);
+      if (!this.editTodo) return;
+
+      const todo = this.todos.find((x) => x.id === id);
+      todo.text = todo.text.trim();
+      if (!todo.text) {
+        this.onRemove(todo.id);
+      }
+      this.editTodo = null;
+    },
+    onCancel: function(todo) {
+      console.log('cancel', todo);
+      todo.text = this.editTodo.text;
+      this.editTodo = null;
     },
     onRemove: function(id) {
       console.log('remove', id);
@@ -116,6 +147,7 @@ h1 {
   background: rgba(0, 0, 0, 0.003);
   box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
 }
+
 .todo__checkbox {
   text-align: center;
   width: 40px;

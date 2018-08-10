@@ -1,12 +1,20 @@
 <template>
   <div class="main">
-    <input type="checkbox" class="todo__checkbox todo__toggle-all" />
+    <input 
+      type="checkbox" 
+      class="todo__checkbox todo__toggle-all" 
+      v-model="allChecked"
+    />
     <ul class="todo-list">
       <todo-list-item 
         v-for="todo in items" 
         :key="todo.id" 
         :item="todo"
-        v-on:remove="$emit('onRemove')"
+        :is-edit="isEditing(todo.id)"
+        @edit="onEdit"
+        @update="onUpdate"
+        @cancel="onCancel"
+        @remove="onRemove"
       >
       </todo-list-item>
     </ul>
@@ -18,11 +26,44 @@ import TodoListItem from '@/components/TodoListItem.vue';
 
 export default {
   name: 'TodoList',
-  props: {
-    items: Array
-  },
   components: {
     TodoListItem
+  },
+  props: {
+    items: Array,
+    editItem: Object
+  },
+  computed: {
+    remaining: function() {
+      return this.items.filter((x) => !x.isComplete).length;
+    },
+    allChecked: {
+      get: function() {
+        return this.remaining === 0;
+      },
+      set: function(value) {
+        this.items.forEach(function(todo) {
+          todo.isComplete = value;
+        });
+      }
+    }
+  },
+  methods: {
+    isEditing: function(id) {
+      return !!(this.editItem && this.editItem.id === id);
+    },
+    onEdit: function(id) {
+      this.$emit('on-edit', id);
+    },
+    onUpdate: function(id) {
+      this.$emit('on-update', id);
+    },
+    onCancel: function(todo) {
+      this.$emit('on-cancel', todo);
+    },
+    onRemove: function(id) {
+      this.$emit('on-remove', id);
+    }
   }
 };
 </script>
