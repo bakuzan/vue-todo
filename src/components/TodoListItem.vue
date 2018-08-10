@@ -22,12 +22,9 @@
         class="edit" 
         v-model="item.text" 
         v-todo-focus="isEdit"
-        placeholder="" 
-        autocomplete="off"
-        autofocus="autofocus"
-        @keyup.enter="$emit('update', item.id)"
-        @blur="$emit('update', item.id)"
-        @keyup.esc="$emit('cancel', item)"
+        @blur="update(item.id, $event)"
+        @keyup.enter="update(item.id)"
+        @keypress.esc="cancel(item, $event)"
       />
   </li>
 </template>
@@ -46,6 +43,15 @@ export default {
         'todo--complete': this.item.isComplete,
         'todo--editing': this.isEdit
       };
+    }
+  },
+  methods: {
+    update: function(...params) {
+      this.$emit('update', ...params);
+    },
+    cancel: function(...params) {
+      console.log('CANCELLLLLLL!');
+      this.$emit('cancel', ...params);
     }
   },
   // a custom directive to wait for the DOM to be updated

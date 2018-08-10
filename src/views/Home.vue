@@ -14,6 +14,7 @@
     </header>
     <TodoList 
       :items="todos"
+      :filter="filter"
       :edit-item="editTodo"
       @on-edit="onEdit"
       @on-update="onUpdate"
@@ -21,20 +22,27 @@
       @on-remove="onRemove"
       @toggle-all="onToggleAll"
     />
-    <footer></footer>
+    <Filters
+      :count-info="countInfo"
+      :active-filter="filter"
+      @clear-complete="handleClearComplete"
+    ></Filters>
   </section>
 </template>
 
 <script>
 // @ is an alias to /src
 import TodoList from '@/components/TodoList.vue';
+import Filters from '@/components/Filters.vue';
 import store from '@/utils/store';
+import filters from '@/utils/filters';
 import * as utils from '@/utils';
 
 export default {
   name: 'home',
   components: {
-    TodoList
+    TodoList,
+    Filters
   },
   data: function() {
     return {
@@ -51,7 +59,19 @@ export default {
       deep: true
     }
   },
-
+  computed: {
+    filter: function() {
+      return this.$route.hash.replace(/.*\//, '');
+    },
+    countInfo: function() {
+      const filteredItems = filters.active(this.todos);
+      const number = filteredItems.length;
+      return {
+        number,
+        text: number != 1 ? 'items left' : 'item left'
+      };
+    }
+  },
   methods: {
     onToggleAll: function() {
       const allTrue = this.todos.every((x) => x.isComplete);
@@ -89,13 +109,17 @@ export default {
     },
     onCancel: function(todo) {
       console.log('cancel', todo);
-      todo.text = this.editTodo.text;
+      const oldValue = this.editTodo.text;
       this.editTodo = null;
+      todo.text = oldValue;
     },
     onRemove: function(id) {
       console.log('remove', id);
       const index = this.todos.findIndex((x) => x.id === id);
       this.todos.splice(index, 1);
+    },
+    handleClearComplete: function() {
+      this.todos = filters.active(this.todos);
     }
   }
 };

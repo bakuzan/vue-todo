@@ -7,7 +7,7 @@
     />
     <ul class="todo-list">
       <todo-list-item 
-        v-for="todo in items" 
+        v-for="todo in filteredTodos" 
         :key="todo.id" 
         :item="todo"
         :is-edit="isEditing(todo.id)"
@@ -23,6 +23,7 @@
 
 <script>
 import TodoListItem from '@/components/TodoListItem.vue';
+import filters from '@/utils/filters';
 
 export default {
   name: 'TodoList',
@@ -31,11 +32,15 @@ export default {
   },
   props: {
     items: Array,
+    filter: String,
     editItem: Object
   },
   computed: {
+    filteredTodos: function() {
+      return filters[this.filter](this.items);
+    },
     remaining: function() {
-      return this.items.filter((x) => !x.isComplete).length;
+      return filters.active(this.items).length;
     },
     allChecked: {
       get: function() {
@@ -55,10 +60,12 @@ export default {
     onEdit: function(id) {
       this.$emit('on-edit', id);
     },
-    onUpdate: function(id) {
+    onUpdate: function(id, event) {
+      console.log('UPDATE CALLED BY ', event);
       this.$emit('on-update', id);
     },
-    onCancel: function(todo) {
+    onCancel: function(todo, event) {
+      console.log('cancelled!', event);
       this.$emit('on-cancel', todo);
     },
     onRemove: function(id) {
