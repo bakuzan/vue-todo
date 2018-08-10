@@ -18,6 +18,7 @@
       <button 
         class="clear-completed"
         @click="$emit('clear-complete')"
+        v-show="hasCompleted"
       >
       Clear Completed
       </button>
@@ -29,7 +30,8 @@ export default {
   name: 'Filters',
   props: {
     countInfo: Object,
-    activeFilter: String
+    activeFilter: String,
+    hasCompleted: Boolean
   }
 };
 </script>
@@ -42,6 +44,18 @@ footer {
   height: 20px;
   text-align: center;
   border-top: 1px solid #e6e6e6;
+}
+footer:before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 50px;
+  overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 8px 0 -3px #f6f6f6,
+    0 9px 1px -3px rgba(0, 0, 0, 0.2), 0 16px 0 -6px #f6f6f6,
+    0 17px 2px -6px rgba(0, 0, 0, 0.2);
 }
 .todo-count {
   float: left;
@@ -76,5 +90,8 @@ footer {
   line-height: 20px;
   text-decoration: none;
   cursor: pointer;
+}
+.clear-completed:hover {
+  text-decoration: underline;
 }
 </style>

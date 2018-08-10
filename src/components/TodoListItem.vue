@@ -24,7 +24,7 @@
         v-todo-focus="isEdit"
         @blur="update(item.id, $event)"
         @keyup.enter="update(item.id)"
-        @keypress.esc="cancel(item, $event)"
+        @keyup.esc="cancel(item, $event)"
       />
   </li>
 </template>
@@ -46,8 +46,9 @@ export default {
     }
   },
   methods: {
-    update: function(...params) {
-      this.$emit('update', ...params);
+    update: function(id, event) {
+      console.log(event);
+      this.$emit('update', id);
     },
     cancel: function(...params) {
       console.log('CANCELLLLLLL!');

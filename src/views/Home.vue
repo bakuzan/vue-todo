@@ -8,7 +8,7 @@
         v-model="newTodo" 
         placeholder="What do you need to do?" 
         autocomplete="off"
-        autofocus="autofocus"
+        autofocus
         @keyup.enter="addTodo"
       />
     </header>
@@ -25,6 +25,7 @@
     <Filters
       :count-info="countInfo"
       :active-filter="filter"
+      :has-completed="hasCompleted"
       @clear-complete="handleClearComplete"
     ></Filters>
   </section>
@@ -70,6 +71,9 @@ export default {
         number,
         text: number != 1 ? 'items left' : 'item left'
       };
+    },
+    hasCompleted: function() {
+      return !!filters.complete(this.todos).length;
     }
   },
   methods: {

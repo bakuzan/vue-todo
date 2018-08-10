@@ -60,8 +60,12 @@ export default {
     onEdit: function(id) {
       this.$emit('on-edit', id);
     },
-    onUpdate: function(id, event) {
-      console.log('UPDATE CALLED BY ', event);
+    onUpdate: function(id) {
+      if (!this.editItem) {
+        console.log('ABORT UPDATE');
+        return;
+      }
+
       this.$emit('on-update', id);
     },
     onCancel: function(todo, event) {
